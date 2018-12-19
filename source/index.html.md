@@ -2,14 +2,11 @@
 title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
+  - xml
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
+  - <a href='onestopshop.online'>OneStopShop Homepage</a>
+  - <a href='mailto:integrations@onestopshop.online'>integrations@onestopshop.online</a>
 
 includes:
   - errors
@@ -19,11 +16,28 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the OneStopShop integration API. You can use our API to send updates on various data types to our platform, as well as receive order data. Some example use-cases are integrating with an ERP, pre-existing online shop, product database, or order-intake tool.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
+<aside>
+There are four possible integrations possible:
+
+* Customers: automatically send your customers database to OneStopShop, so accounts can be easily created
+* Products: automatically send your product data to OneStopShop, such as the SKU number, EAN code, picture(s) and order description
+* Prices: automatically send the specific prices per product, per customers. OneStopShop is fully capable of offering different prices for the same SKU to different customers, if required
+* Orders: automatically receive the orders in an XML format to easily import them in the existing order flow
+
+On this page, the following is explained:
+
+* Data structure: the fields and contents of fields per topic
+* Integration types: the types of documents we accept (XML / CSV / ….) What do we currently order?
+* Transfer method: the way the files can be send to, or received from, OneStopShop
+</aside>
+
+
+<aside class="notice">
+These docs are currently in in draft status
+</aside>
 
 # Authentication
 
@@ -64,6 +78,121 @@ Kittn expects for the API key to be included in all API requests to the server i
 <aside class="notice">
 You must replace <code>meowmeowmeow</code> with your personal API key.
 </aside>
+
+# Customers
+
+## Create new customers
+
+```xml
+<customers>
+  <customer>
+    <first_name>John</first_name>
+    <last_name>Kanters</last_name>
+    <email>info@kantersrestaurant.nl</email>
+    <company>Kanters Restaurant</company>
+    <address_1>Steenweg 2</address_1>
+    <city>Moerdijk</city>
+    <zip>4781 PA</zip>
+    <country>Netherlands</country>
+    <country_code>NL</country_code>
+    <phone>31168412310</phone>
+    <account_number>SoldTo10174993</account_number>
+    <price_groups>KANTERS</price_groups>
+  </customer>
+</customers>
+```
+
+
+Property | Type | Required | Description
+--------- | --------- | ----------- | ---------
+first_name | String | **true** | Customer's first name
+last_name | String | **true** | Customer's last name
+email | String | **true** | Contact email address
+company | String | **true** | Company Name
+address_1 | String | **true** | First line of address
+city | String | **true** |
+zip | String | **true** |
+country | String | **true** |
+country_code | String | **true** | [ISO_3166 (Alpha-2)](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) Country Code
+phone | String | **true** |
+account_number | String | **true** | The account number used by the Vendor to identify the customer
+price_groups | String | false | A comma-separated list of price groups this customer is a member of
+
+
+# Products
+
+## Create new products
+
+```xml
+<products>
+  <product>
+    <sku>7550795</sku>
+    <ean_code>312453629932739234</ean_code>
+    <title>1Wine Rose</title>
+    <pack_size>24X18.7Cl</pack_size>
+    <brand>1Wine</brand>
+    <description>Een rose wijn uit Frankrijk met een zoete afdronk</description>
+    <vendor>AB InBev</vendor>
+    <product_type>Wijn</product_type>
+    <product_subgroup>rose-wijn</product_subgroup>
+    <price>3440</price>
+    <image_url>https://cdn.shopify.com/s/files/1/2113/6405/products/rose.jpg?v=1523438325</image_url>
+    <portion_type>Piece</portion_type>
+  </product>
+</products>
+```
+
+Property | Type | Required | Description
+--------- | --------- | ----------- | ---------
+sku | String | **true** |
+ean_code | Integer | **true** |
+title | String | **true** |
+pack_size | String | **true** |
+brand | String | **true** |
+description | String | false |
+vendor | String | **true** |
+product_type | String | **true** |
+product_subgroup | String | **true** |
+price | Integer | **true** |
+image_url | String | **true** |
+portion_type | String | false |
+
+# Price Lists
+
+## Create new price lists
+
+```xml
+<price_list>
+  <product>
+    <sku>7550795</sku>
+    <price_group>
+      <id>KANTERS</id>
+      <price>2261</price>
+    </price_group>
+    <price_group>
+      <id>SMITH</id>
+      <price>2044</price>
+    </price_group>
+  </product>
+  <prices>
+    <sku>7550796</sku>
+    <price_group>
+      <id>KANTERS</id>
+      <price>61</price>
+    </price_group>
+    <price_group>
+      <id>SMITH</id>
+      <price>106</price>
+    </price_group>
+  </prices>
+</price_list>
+```
+
+# Orders
+
+## Receive new order data
+
+-----------------------------
 
 # Kittens
 
@@ -127,7 +256,7 @@ This endpoint retrieves all kittens.
 Parameter | Default | Description
 --------- | ------- | -----------
 include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+available | **true** | If set to false, the result will include kittens that have already been adopted.
 
 <aside class="success">
 Remember — a happy kitten is an authenticated kitten!
